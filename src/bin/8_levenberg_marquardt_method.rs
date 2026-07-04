@@ -1,5 +1,3 @@
-// この実装は AI (Claude) が作成したもので、著者はまだレビューしていない。
-//
 // Levenberg-Marquardt 法 (docs/ai/8_levenberg_marquardt_method.md)
 //
 // ガウス・ニュートン法にダンピング λ を加え、ゲイン比で λ を適応更新する

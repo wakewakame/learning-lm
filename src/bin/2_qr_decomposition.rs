@@ -1,5 +1,3 @@
-// この実装は AI (Claude) が作成したもので、著者はまだレビューしていない。
-//
 // QR 分解 (docs/ai/2_qr_decomposition.md)
 //
 // - ハウスホルダー変換による QR 分解 (実装は src/lib.rs) の性質を確認する

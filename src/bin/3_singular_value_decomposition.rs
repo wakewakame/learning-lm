@@ -1,5 +1,3 @@
-// この実装は AI (Claude) が作成したもので、著者はまだレビューしていない。
-//
 // 特異値分解 (SVD) (docs/ai/3_singular_value_decomposition.md)
 //
 // - 片側ヤコビ法による SVD (実装は src/lib.rs) の性質を確認する
