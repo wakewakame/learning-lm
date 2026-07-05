@@ -29,9 +29,9 @@
 
 サンプルコードと同じ題材を使う。**指数減衰モデル**
 
-$$
+```math
 f(x; \boldsymbol{\beta}) = \beta_1 e^{\beta_2 x}
-$$
+```
 
 をデータにフィットさせたい。$\boldsymbol{\beta} = (\beta_1, \beta_2)^\top$ が求めたい未知パラメータである。$\beta_2 < 0$ なら $x$ が増えるにつれて $y$ が指数的に減っていく曲線で、放射性物質の崩壊、コンデンサの放電、薬の血中濃度など、自然界のいたるところに現れる形である。
 
@@ -43,9 +43,9 @@ $$
 
 つまり「答えを知った上でノイズ入りデータを作り、そこから答えを推定し直せるか」を試す設定である。フィットの良し悪しは、線形のときとまったく同じく**残差の二乗和**
 
-$$
+```math
 E(\boldsymbol{\beta}) = \sum_{i=1}^{n} \bigl( y_i - f(x_i; \boldsymbol{\beta}) \bigr)^2
-$$
+```
 
 で測り、これを最小にする $\boldsymbol{\beta}$ を探す。$n = 30$ である。目的関数 $E$ の定義は線形の場合と一字一句同じであり、**変わったのはモデル $f$ の中身だけ**である。
 
@@ -53,17 +53,17 @@ $$
 
 [線形最小二乗法](./1_least_squares_method.md) で強調したとおり、「線形」とはモデルが**パラメータについて**線形、すなわち
 
-$$
+```math
 f(x; \boldsymbol{\beta}) = \beta_1 \phi_1(x) + \beta_2 \phi_2(x) + \cdots + \beta_m \phi_m(x)
-$$
+```
 
 という「係数 × 決まった関数」の和で書けることを指した。$\phi_k(x) = x^2$ や $\sin x$ のように $x$ について曲がっていても構わない。
 
 指数減衰モデル $\beta_1 e^{\beta_2 x}$ はどうか。$\beta_1$ については線形である ($\beta_1$ 倍しているだけ)。しかし $\beta_2$ は**指数の肩に乗っている**。どんな関数 $\phi_1, \phi_2$ を選んでも
 
-$$
+```math
 \beta_1 e^{\beta_2 x} = \beta_1 \phi_1(x) + \beta_2 \phi_2(x)
-$$
+```
 
 の形には書けない。左辺で $\beta_2$ を動かすと曲線の「曲がり方」自体が変わるのに対し、右辺で $\beta_2$ を動かしても固定された形 $\phi_2(x)$ の混ぜる量が変わるだけだからである。このように、パラメータの少なくとも 1 つが線形結合の形に収まらないモデルを扱うのが非線形最小二乗法である。他の例としては
 
@@ -88,25 +88,25 @@ $$
 
 指数減衰モデルで $E$ を実際に展開してみる。
 
-$$
+```math
 E(\beta_1, \beta_2)
 = \sum_{i=1}^{n} \bigl( y_i - \beta_1 e^{\beta_2 x_i} \bigr)^2
 = \sum_{i=1}^{n} y_i^2
 \ - \ 2 \beta_1 \sum_{i=1}^{n} y_i \, e^{\beta_2 x_i}
 \ + \ \beta_1^2 \sum_{i=1}^{n} e^{2 \beta_2 x_i}
-$$
+```
 
 $\beta_1$ については確かに 2 次式である。しかし $\beta_2$ は $e^{\beta_2 x_i}$ の中に閉じ込められており、$E$ は $\beta_2$ の多項式ではない。「凸 2 次関数」という構造はここで壊れる。
 
 それでも最小点では勾配が $\mathbf{0}$ になるはずなので ([0. 数学の準備](./0_math_preliminaries.md) の第 5 節)、$\nabla E = \mathbf{0}$ を書き下してみる。各成分を偏微分すると (計算の詳細は第 5 節で丁寧にやるので、ここでは結果だけ見る)
 
-$$
+```math
 \frac{\partial E}{\partial \beta_1}
 = -2 \sum_{i=1}^{n} e^{\beta_2 x_i} \bigl( y_i - \beta_1 e^{\beta_2 x_i} \bigr) = 0,
 \qquad
 \frac{\partial E}{\partial \beta_2}
 = -2 \sum_{i=1}^{n} \beta_1 x_i e^{\beta_2 x_i} \bigl( y_i - \beta_1 e^{\beta_2 x_i} \bigr) = 0
-$$
+```
 
 線形の場合はここが連立 **1 次**方程式になったから解けた。今回は未知数 $\beta_2$ が $e^{\beta_2 x_i}$ の中にいるため、この 2 本の式は**非線形連立方程式**である。移項して $\beta_2 = \cdots$ の形に変形する方法は存在せず、**閉じた形の解 (公式) は書けない**。
 
@@ -122,9 +122,9 @@ $$
 
 モデルを $f(x; \beta) = \sin(\beta x)$、データを 1 点だけ $(x_1, y_1) = (1, \ 0.9)$ とすると、目的関数は
 
-$$
+```math
 E(\beta) = (0.9 - \sin \beta)^2
-$$
+```
 
 である。$\sin \beta$ は $\beta$ を動かすと $-1$ と $1$ の間を永遠に往復するから、$E(\beta)$ のグラフは
 
@@ -158,26 +158,26 @@ $$
 
 $i$ 番目のデータ点における「観測値とモデルのずれ」を**残差** (residual) と呼び、
 
-$$
+```math
 r_i(\boldsymbol{\beta}) = y_i - f(x_i; \boldsymbol{\beta})
 \qquad (i = 1, \dots, n)
-$$
+```
 
 と定義する。$n$ 個の残差を縦に並べたものが**残差ベクトル**
 
-$$
+```math
 \mathbf{r}(\boldsymbol{\beta}) =
 \begin{bmatrix}
 r_1(\boldsymbol{\beta}) \\ r_2(\boldsymbol{\beta}) \\ \vdots \\ r_n(\boldsymbol{\beta})
 \end{bmatrix}
 \in \mathbb{R}^n
-$$
+```
 
 である。ここで大事なのは、$\mathbf{r}$ が「$\boldsymbol{\beta}$ を入れるとベクトルが返ってくる関数」だという見方である。目的関数はノルムを使って
 
-$$
+```math
 E(\boldsymbol{\beta}) = \sum_{i=1}^{n} r_i(\boldsymbol{\beta})^2 = \| \mathbf{r}(\boldsymbol{\beta}) \|^2
-$$
+```
 
 と書ける ([0. 数学の準備](./0_math_preliminaries.md) 第 2 節)。線形の場合は $\mathbf{r} = \mathbf{y} - \Phi \boldsymbol{\beta}$ という 1 次式だったが、今は $\boldsymbol{\beta}$ に対して非線形な関数である。
 
@@ -185,7 +185,7 @@ $$
 
 反復法では「今いる $\boldsymbol{\beta}$ を少し動かしたら、残差はどう変わるか」という情報が要る。残差は $n$ 個、パラメータは $m$ 個あるから、変化の仕方は $n \times m$ 通りある。それを全部並べた表が**ヤコビ行列** (Jacobian matrix) である。
 
-$$
+```math
 J(\boldsymbol{\beta}) =
 \begin{bmatrix}
 \dfrac{\partial r_1}{\partial \beta_1} & \dfrac{\partial r_1}{\partial \beta_2} & \cdots & \dfrac{\partial r_1}{\partial \beta_m} \\[2mm]
@@ -196,7 +196,7 @@ J(\boldsymbol{\beta}) =
 \in \mathbb{R}^{n \times m},
 \qquad
 J_{ik} = \frac{\partial r_i}{\partial \beta_k}
-$$
+```
 
 行と列の意味を言葉にしておく。
 
@@ -209,38 +209,38 @@ $$
 
 定義だけでは掴みにくいので、指数減衰モデルで実際に全成分を計算する。残差は
 
-$$
+```math
 r_i(\beta_1, \beta_2) = y_i - \beta_1 e^{\beta_2 x_i}
-$$
+```
 
 である。$y_i$ と $x_i$ はデータであってただの定数であることに注意し、$\beta_1$ と $\beta_2$ で順に偏微分する。
 
 **$\beta_1$ での偏微分。** $\beta_2$ を定数とみなすと、$e^{\beta_2 x_i}$ は定数であり、$r_i$ は「定数 − $\beta_1$ × 定数」という $\beta_1$ の 1 次式である。よって
 
-$$
+```math
 \frac{\partial r_i}{\partial \beta_1}
 = \frac{\partial}{\partial \beta_1} \bigl( y_i - \beta_1 e^{\beta_2 x_i} \bigr)
 = - e^{\beta_2 x_i}
-$$
+```
 
 **$\beta_2$ での偏微分。** 今度は $\beta_1$ を定数とみなす。$e^{\beta_2 x_i}$ を $\beta_2$ で微分するには、$u = \beta_2 x_i$ とおく連鎖律を使う ([0. 数学の準備](./0_math_preliminaries.md) 第 5 節)。$\dfrac{d}{du} e^u = e^u$、$\dfrac{\partial u}{\partial \beta_2} = x_i$ なので
 
-$$
+```math
 \frac{\partial}{\partial \beta_2} e^{\beta_2 x_i}
 = e^{\beta_2 x_i} \cdot x_i
-$$
+```
 
 よって
 
-$$
+```math
 \frac{\partial r_i}{\partial \beta_2}
 = \frac{\partial}{\partial \beta_2} \bigl( y_i - \beta_1 e^{\beta_2 x_i} \bigr)
 = - \beta_1 x_i e^{\beta_2 x_i}
-$$
+```
 
 以上より、ヤコビ行列は $n \times 2$ の行列として全成分が求まった。
 
-$$
+```math
 J(\boldsymbol{\beta}) =
 \begin{bmatrix}
 - e^{\beta_2 x_1} & - \beta_1 x_1 e^{\beta_2 x_1} \\
@@ -248,7 +248,7 @@ J(\boldsymbol{\beta}) =
 \vdots & \vdots \\
 - e^{\beta_2 x_n} & - \beta_1 x_n e^{\beta_2 x_n}
 \end{bmatrix}
-$$
+```
 
 これはサンプルコードの `jacobian` 関数そのものである (行列の $(i, k)$ 成分を、$k = 0$ なら `-e`、$k = 1$ なら `-beta[0] * x * e` としている。$e$ は $e^{\beta_2 x_i}$ のこと)。
 
@@ -258,11 +258,11 @@ $$
 
 数字で確かめたい人のために、データ 3 点だけのミニチュア版を手計算する。データを
 
-$$
+```math
 (x_1, y_1) = (0, \ 2.0), \qquad
 (x_2, y_2) = (1, \ 0.5), \qquad
 (x_3, y_3) = (2, \ 0.2)
-$$
+```
 
 とし、パラメータを $\boldsymbol{\beta} = (1, \ -1)^\top$ (つまり $\beta_1 = 1, \beta_2 = -1$) とする。まずモデルの値と残差を計算する。$e^{-1} \approx 0.368$、$e^{-2} \approx 0.135$ を使うと
 
@@ -274,14 +274,14 @@ $$
 
 次にヤコビ行列。第 1 列は $-e^{\beta_2 x_i} = -e^{-x_i}$、第 2 列は $-\beta_1 x_i e^{\beta_2 x_i} = -x_i e^{-x_i}$ なので
 
-$$
+```math
 J =
 \begin{bmatrix}
 -1.000 & 0 \\
 -0.368 & -0.368 \\
 -0.135 & -0.271
 \end{bmatrix}
-$$
+```
 
 ($J_{32} = -2 \times 0.135 = -0.271$)。第 1 行第 2 列が $0$ なのは、$x_1 = 0$ では $f = \beta_1 e^{0} = \beta_1$ となって $\beta_2$ が式から消えるためである。「$x = 0$ の点は $\beta_2$ を動かしても影響を受けない」という事実が、ヤコビ行列の成分にそのまま表れている。
 
@@ -289,11 +289,11 @@ $$
 
 手で導いた偏微分が正しいかどうかは、**数値微分**で機械的に確かめられる。偏微分の定義は「$\beta_k$ をほんの少し動かしたときの変化率」だから、小さな $h$ を使って
 
-$$
+```math
 \frac{\partial r_i}{\partial \beta_k}
 \approx
 \frac{r_i(\boldsymbol{\beta} + h \mathbf{e}_k) - r_i(\boldsymbol{\beta} - h \mathbf{e}_k)}{2h}
-$$
+```
 
 と近似できる ($\mathbf{e}_k$ は第 $k$ 成分だけ 1 のベクトル)。前後対称に取るこの形は**中心差分**と呼ばれ、片側だけの差分より精度が良い。
 
@@ -312,15 +312,15 @@ $$
 
 材料が揃ったので、この文書の山場である**勾配の公式**を導く。目的関数
 
-$$
+```math
 E(\boldsymbol{\beta}) = \sum_{i=1}^{n} r_i(\boldsymbol{\beta})^2
-$$
+```
 
 の勾配 $\nabla E$ が、ヤコビ行列と残差ベクトルの積という極めて簡潔な形
 
-$$
+```math
 \nabla E = 2 J^\top \mathbf{r}
-$$
+```
 
 にまとまることを示す。
 
@@ -328,34 +328,34 @@ $$
 
 勾配の第 $k$ 成分、すなわち $\dfrac{\partial E}{\partial \beta_k}$ を計算する。和の微分は微分の和なので
 
-$$
+```math
 \frac{\partial E}{\partial \beta_k}
 = \frac{\partial}{\partial \beta_k} \sum_{i=1}^{n} r_i^2
 = \sum_{i=1}^{n} \frac{\partial}{\partial \beta_k} \bigl( r_i^2 \bigr)
-$$
+```
 
 各項 $r_i^2$ は「$\beta_k \mapsto r_i \mapsto r_i^2$」という合成関数である。外側は 2 乗する関数 $g(t) = t^2$ で $g'(t) = 2t$、内側は $r_i(\boldsymbol{\beta})$ だから、連鎖律 ([0. 数学の準備](./0_math_preliminaries.md) 第 5 節) により
 
-$$
+```math
 \frac{\partial}{\partial \beta_k} \bigl( r_i^2 \bigr)
 = 2 r_i \cdot \frac{\partial r_i}{\partial \beta_k}
-$$
+```
 
 これを Σ に戻すと
 
-$$
+```math
 \frac{\partial E}{\partial \beta_k}
 = \sum_{i=1}^{n} 2 r_i \frac{\partial r_i}{\partial \beta_k}
 = 2 \sum_{i=1}^{n} \frac{\partial r_i}{\partial \beta_k} \, r_i
-$$
+```
 
 ここでヤコビ行列の定義 $J_{ik} = \dfrac{\partial r_i}{\partial \beta_k}$ を思い出すと
 
-$$
+```math
 \frac{\partial E}{\partial \beta_k}
 = 2 \sum_{i=1}^{n} J_{ik} \, r_i
 \tag{5.1}
-$$
+```
 
 これで勾配の各成分が「ヤコビ行列の第 $k$ 列と残差ベクトルの内積の 2 倍」であることが分かった。
 
@@ -365,30 +365,30 @@ $$
 
 式 (5.1) に現れるのは $\sum_i J_{ik} r_i$ で、添字の位置に注目すると $J$ の第 $k$ **列**と $\mathbf{r}$ の内積になっている。「列との内積」を「行との内積」に読み替えるには転置を使えばよい。転置の定義 $(J^\top)_{ki} = J_{ik}$ より
 
-$$
+```math
 \sum_{i=1}^{n} J_{ik} \, r_i
 = \sum_{i=1}^{n} (J^\top)_{ki} \, r_i
 = \bigl( J^\top \mathbf{r} \bigr)_k
-$$
+```
 
 よって式 (5.1) は
 
-$$
+```math
 \frac{\partial E}{\partial \beta_k} = 2 \bigl( J^\top \mathbf{r} \bigr)_k
 \qquad (k = 1, \dots, m)
-$$
+```
 
 となり、$m$ 個の成分をまとめてベクトルとして書けば
 
-$$
+```math
 \boxed{\ \nabla E(\boldsymbol{\beta}) = 2 \, J(\boldsymbol{\beta})^\top \mathbf{r}(\boldsymbol{\beta}) \ }
-$$
+```
 
 が得られる。$J^\top$ は $m \times n$、$\mathbf{r}$ は $n$ 次元なので、積は $m$ 次元ベクトルとなり、勾配の次元と確かに一致している。
 
 $m = 2$ の場合に中身を開いて見れば、まとめ方は一目瞭然である。
 
-$$
+```math
 2 J^\top \mathbf{r}
 = 2
 \begin{bmatrix}
@@ -408,7 +408,7 @@ r_1 \\ r_2 \\ \vdots \\ r_n
 \dfrac{\partial E}{\partial \beta_1} \\[2mm]
 \dfrac{\partial E}{\partial \beta_2}
 \end{bmatrix}
-$$
+```
 
 この公式のありがたみは、**1 階微分の情報が $J$ に全部詰まっている**ことにある。モデルごとに $\nabla E$ を一から計算し直す必要はなく、ヤコビ行列さえ用意すれば、勾配は「転置して掛けて 2 倍」で機械的に得られる。文書 5 以降の反復法は、すべてこの形を通して勾配を計算する。
 
@@ -416,7 +416,7 @@ $$
 
 4.4 節のミニチュア例で $\nabla E = 2 J^\top \mathbf{r}$ を計算してみる。$\mathbf{r} = (1.000, \ 0.132, \ 0.065)^\top$ だった。
 
-$$
+```math
 J^\top \mathbf{r} =
 \begin{bmatrix}
 -1.000 & -0.368 & -0.135 \\
@@ -425,7 +425,7 @@ J^\top \mathbf{r} =
 \begin{bmatrix}
 1.000 \\ 0.132 \\ 0.065
 \end{bmatrix}
-$$
+```
 
 第 1 成分: $(-1.000)(1.000) + (-0.368)(0.132) + (-0.135)(0.065) = -1.000 - 0.049 - 0.009 = -1.058$
 
@@ -433,12 +433,12 @@ $$
 
 よって
 
-$$
+```math
 \nabla E = 2 J^\top \mathbf{r} \approx
 \begin{bmatrix}
 -2.115 \\ -0.132
 \end{bmatrix}
-$$
+```
 
 意味を読み取っておく。どの残差も正 (データがモデルより上にある) なので、モデルを持ち上げるべき状況である。$\dfrac{\partial E}{\partial \beta_1} < 0$ は「$\beta_1$ を増やすと $E$ が減る」ことを意味し、$\beta_1$ を増やす = 曲線全体を持ち上げる、という直感と合致する。勾配は単なる記号ではなく「どちらへ動けば良くなるか」を指す矢印 (の逆向き) なのである。
 
@@ -446,18 +446,18 @@ $$
 
 新しい公式を得たら、既知の場合に帰着して検算するのが良い習慣である。線形モデルでは $\mathbf{r} = \mathbf{y} - \Phi \boldsymbol{\beta}$ であり、成分で書けば $r_i = y_i - \sum_k \Phi_{ik} \beta_k$ なので
 
-$$
+```math
 J_{ik} = \frac{\partial r_i}{\partial \beta_k} = - \Phi_{ik}
 \quad \Longrightarrow \quad
 J = -\Phi
-$$
+```
 
 ヤコビ行列が $\boldsymbol{\beta}$ によらない**定数行列**になるのが線形の特徴である。公式に代入すると
 
-$$
+```math
 \nabla E = 2 J^\top \mathbf{r} = 2 (-\Phi)^\top (\mathbf{y} - \Phi \boldsymbol{\beta}) = -2 \Phi^\top (\mathbf{y} - \Phi \boldsymbol{\beta})
 = 2 \Phi^\top \Phi \boldsymbol{\beta} - 2 \Phi^\top \mathbf{y}
-$$
+```
 
 これは [線形最小二乗法](./1_least_squares_method.md) 第 4 節で導いた勾配と完全に一致し、$\nabla E = \mathbf{0}$ とおけば正規方程式が出てくる。つまり $\nabla E = 2 J^\top \mathbf{r}$ は線形の場合を特別な場合として含む、より一般的な公式である。
 
@@ -479,20 +479,20 @@ $$
 
 式 (5.1) をもう一度 $\beta_l$ で偏微分する。積の微分法則を使うと
 
-$$
+```math
 \frac{\partial^2 E}{\partial \beta_l \partial \beta_k}
 = 2 \sum_{i=1}^{n} \frac{\partial}{\partial \beta_l} \Bigl( \frac{\partial r_i}{\partial \beta_k} \, r_i \Bigr)
 = 2 \sum_{i=1}^{n} \Bigl(
 \frac{\partial r_i}{\partial \beta_k} \frac{\partial r_i}{\partial \beta_l}
 + r_i \frac{\partial^2 r_i}{\partial \beta_l \partial \beta_k}
 \Bigr)
-$$
+```
 
 第 1 項の Σ は $\sum_i J_{ik} J_{il} = (J^\top J)_{kl}$ とまとまるので、ヘッセ行列 (2 階偏微分を並べた行列) は
 
-$$
+```math
 \nabla^2 E = 2 \Bigl( J^\top J + \sum_{i=1}^{n} r_i \nabla^2 r_i \Bigr)
-$$
+```
 
 という 2 つの項に分かれる ($\nabla^2 r_i$ は $r_i$ のヘッセ行列)。ここに重要な観察が 2 つある。
 
@@ -507,15 +507,15 @@ $$
 
 指数減衰モデルには、昔からよく知られた近道がある。$y = \beta_1 e^{\beta_2 x}$ の両辺の対数を取ると
 
-$$
+```math
 \log y = \log \beta_1 + \beta_2 x
-$$
+```
 
 ここで $b_1 = \log \beta_1$, $b_2 = \beta_2$ とおけば、$(x, \log y)$ 平面では
 
-$$
+```math
 \log y = b_1 + b_2 x
-$$
+```
 
 という**直線**のフィッティングになる。これは [線形最小二乗法](./1_least_squares_method.md) 第 7 節でやった直線フィットそのものであり、公式一発で $b_1, b_2$ が求まる。最後に $\beta_1 = e^{b_1}$ と戻せば、指数モデルのパラメータが反復法なしで手に入る。サンプルコードの `log_linearized_fit` がこの計算である (なお $\log y_i$ を取るため、この方法は $y_i > 0$ のデータにしか使えない)。
 
@@ -525,15 +525,15 @@ $$
 
 直線フィットが最小化しているのは
 
-$$
+```math
 E_{\log}(b_1, b_2) = \sum_{i=1}^{n} \bigl( \log y_i - (b_1 + b_2 x_i) \bigr)^2
-$$
+```
 
 すなわち **$\log y$ の残差**の二乗和である。一方、われわれが本当に最小化したいのは
 
-$$
+```math
 E(\beta_1, \beta_2) = \sum_{i=1}^{n} \bigl( y_i - \beta_1 e^{\beta_2 x_i} \bigr)^2
-$$
+```
 
 すなわち **$y$ そのものの残差**の二乗和である。$\log$ は値の大小を非線形に圧縮するので、$E_{\log}$ と $E$ は別の関数であり、**最小点も一般に異なる**。
 
