@@ -242,8 +242,11 @@ $$
 
 $$
 J(\boldsymbol{\beta}) =
-\begin{bmatrix} - e^{\beta_2 x_1} & - \beta_1 x_1 e^{\beta_2 x_1} \\ - e^{\beta_2 x_2} & - \beta_1 x_2 e^{\beta_2 x_2} \\
-\vdots & \vdots \\ - e^{\beta_2 x_n} & - \beta_1 x_n e^{\beta_2 x_n}
+\begin{bmatrix}
+- e^{\beta_2 x_1} & - \beta_1 x_1 e^{\beta_2 x_1} \\
+- e^{\beta_2 x_2} & - \beta_1 x_2 e^{\beta_2 x_2} \\
+\vdots & \vdots \\
+- e^{\beta_2 x_n} & - \beta_1 x_n e^{\beta_2 x_n}
 \end{bmatrix}
 $$
 
@@ -399,7 +402,8 @@ r_1 \\ r_2 \\ \vdots \\ r_n
 \begin{bmatrix}
 \displaystyle \sum_{i=1}^{n} \frac{\partial r_i}{\partial \beta_1} r_i \\[3mm]
 \displaystyle \sum_{i=1}^{n} \frac{\partial r_i}{\partial \beta_2} r_i
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 \dfrac{\partial E}{\partial \beta_1} \\[2mm]
 \dfrac{\partial E}{\partial \beta_2}
@@ -479,7 +483,8 @@ $$
 \frac{\partial^2 E}{\partial \beta_l \partial \beta_k}
 = 2 \sum_{i=1}^{n} \frac{\partial}{\partial \beta_l} \Bigl( \frac{\partial r_i}{\partial \beta_k} \, r_i \Bigr)
 = 2 \sum_{i=1}^{n} \Bigl(
-\frac{\partial r_i}{\partial \beta_k} \frac{\partial r_i}{\partial \beta_l} + r_i \frac{\partial^2 r_i}{\partial \beta_l \partial \beta_k}
+\frac{\partial r_i}{\partial \beta_k} \frac{\partial r_i}{\partial \beta_l}
++ r_i \frac{\partial^2 r_i}{\partial \beta_l \partial \beta_k}
 \Bigr)
 $$
 

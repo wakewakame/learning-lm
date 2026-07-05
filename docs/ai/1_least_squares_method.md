@@ -245,7 +245,9 @@ $$
 \begin{aligned}
 \| \mathbf{y} - \mathbf{v} \|^2
 &= \| (\mathbf{y} - \hat{\mathbf{y}}) + (\hat{\mathbf{y}} - \mathbf{v}) \|^2 \\
-&= \| \mathbf{y} - \hat{\mathbf{y}} \|^2 + 2 \, (\mathbf{y} - \hat{\mathbf{y}}) \cdot (\hat{\mathbf{y}} - \mathbf{v}) + \| \hat{\mathbf{y}} - \mathbf{v} \|^2 \\
+&= \| \mathbf{y} - \hat{\mathbf{y}} \|^2
++ 2 \, (\mathbf{y} - \hat{\mathbf{y}}) \cdot (\hat{\mathbf{y}} - \mathbf{v})
++ \| \hat{\mathbf{y}} - \mathbf{v} \|^2 \\
 &= \| \mathbf{y} - \hat{\mathbf{y}} \|^2 + 0 + \| \hat{\mathbf{y}} - \mathbf{v} \|^2 \\
 &\geq \| \mathbf{y} - \hat{\mathbf{y}} \|^2
 \end{aligned}
@@ -477,11 +479,13 @@ $$
 1 & 0 \\
 1 & 1 \\
 1 & 2
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 1 \cdot 1 + 1 \cdot 1 + 1 \cdot 1 & 1 \cdot 0 + 1 \cdot 1 + 1 \cdot 2 \\
 0 \cdot 1 + 1 \cdot 1 + 2 \cdot 1 & 0 \cdot 0 + 1 \cdot 1 + 2 \cdot 2
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 3 & 3 \\
 3 & 5
@@ -508,11 +512,13 @@ $$
 \end{bmatrix}
 \begin{bmatrix}
 1 \\ 3 \\ 4
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 1 + 3 + 4 \\
 0 \cdot 1 + 1 \cdot 3 + 2 \cdot 4
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 8 \\ 11
 \end{bmatrix}
@@ -527,7 +533,8 @@ $$
 \end{bmatrix}
 \begin{bmatrix}
 \beta_1 \\ \beta_2
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 8 \\ 11
 \end{bmatrix}

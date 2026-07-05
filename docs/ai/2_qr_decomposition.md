@@ -110,7 +110,8 @@ Q_{\text{回転}}^\top Q_{\text{回転}} =
 \begin{bmatrix}
 \cos\theta & -\sin\theta \\
 \sin\theta & \cos\theta
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 \cos^2\theta + \sin^2\theta & 0 \\
 0 & \sin^2\theta + \cos^2\theta
@@ -195,7 +196,8 @@ $$
 \end{bmatrix}
 \begin{bmatrix}
 x_1 \\ x_2 \\ x_3
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 5 \\ 8 \\ 4
 \end{bmatrix}
@@ -276,7 +278,8 @@ $$
 3 & 1 \\
 4 & 2
 \end{bmatrix}
-}_{A} =
+}_{A}
+=
 \underbrace{
 \begin{bmatrix}
 3/5 & -4/5 \\
@@ -317,7 +320,8 @@ $$
 
 $$
 \mathbf{a}_k
-= \sum_{j=1}^{k-1} \underbrace{( \mathbf{q}_j \cdot \mathbf{a}_k )}_{r_{jk}} \, \mathbf{q}_j + \underbrace{\| \tilde{\mathbf{q}}_k \|}_{r_{kk}} \, \mathbf{q}_k
+= \sum_{j=1}^{k-1} \underbrace{( \mathbf{q}_j \cdot \mathbf{a}_k )}_{r_{jk}} \, \mathbf{q}_j
++ \underbrace{\| \tilde{\mathbf{q}}_k \|}_{r_{kk}} \, \mathbf{q}_k
 $$
 
 となり、$\mathbf{a}_k$ は $\mathbf{q}_1, \dots, \mathbf{q}_k$ **まで**の線形結合で書ける。係数 $r_{jk}$ を $(j, k)$ 成分に並べた行列 $R_1$ は上三角になり、列ごとの式をまとめれば
@@ -401,7 +405,8 @@ $$
 $$
 \mathbf{v} \mathbf{v}^\top =
 \begin{bmatrix} -2 \\ 4 \end{bmatrix}
-\begin{bmatrix} -2 & 4 \end{bmatrix} =
+\begin{bmatrix} -2 & 4 \end{bmatrix}
+=
 \begin{bmatrix}
 4 & -8 \\
 -8 & 16
@@ -413,11 +418,13 @@ H = I - \frac{2}{20}
 \begin{bmatrix}
 4 & -8 \\
 -8 & 16
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 1 - 2/5 & 4/5 \\
 4/5 & 1 - 8/5
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix}
 3/5 & 4/5 \\
 4/5 & -3/5
@@ -432,11 +439,13 @@ H \mathbf{x} =
 3/5 & 4/5 \\
 4/5 & -3/5
 \end{bmatrix}
-\begin{bmatrix} 3 \\ 4 \end{bmatrix} =
+\begin{bmatrix} 3 \\ 4 \end{bmatrix}
+=
 \begin{bmatrix}
 9/5 + 16/5 \\
 12/5 - 12/5
-\end{bmatrix} =
+\end{bmatrix}
+=
 \begin{bmatrix} 5 \\ 0 \end{bmatrix}
 $$
 
@@ -466,22 +475,29 @@ $$
 
 $$
 A =
-\begin{bmatrix} * & * & * \\ * & * & * \\ * & * & * \\ * & * & *
+\begin{bmatrix}
+* & * & * \\
+* & * & * \\
+* & * & * \\
+* & * & *
 \end{bmatrix}
 \ \xrightarrow{H_1}\
-\begin{bmatrix} * & * & * \\
+\begin{bmatrix}
+* & * & * \\
 0 & * & * \\
 0 & * & * \\
 0 & * & *
 \end{bmatrix}
 \ \xrightarrow{H_2}\
-\begin{bmatrix} * & * & * \\
+\begin{bmatrix}
+* & * & * \\
 0 & * & * \\
 0 & 0 & * \\
 0 & 0 & *
 \end{bmatrix}
 \ \xrightarrow{H_3}\
-\begin{bmatrix} * & * & * \\
+\begin{bmatrix}
+* & * & * \\
 0 & * & * \\
 0 & 0 & * \\
 0 & 0 & 0
@@ -501,7 +517,7 @@ $$
 A = \underbrace{H_1 H_2 \cdots H_m}_{Q} R
 $$
 
-を得る。直交行列の積はまた直交行列なので ($(H_1 H_2)^\top (H_1 H_2) = H_2^\top H_1^\top H_1 H_2 = I$)、$Q$ は直交行列であり、これでフル QR 分解が構成できた。
+を得る。直交行列の積はまた直交行列なので ($ (H_1 H_2)^\top (H_1 H_2) = H_2^\top H_1^\top H_1 H_2 = I$)、$Q$ は直交行列であり、これでフル QR 分解が構成できた。
 
 ### 5.4 なぜグラム・シュミットより安定なのか
 
@@ -560,9 +576,11 @@ $$
 と分割する。すると
 
 $$
-R \boldsymbol{\beta} - Q^\top \mathbf{y} =
+R \boldsymbol{\beta} - Q^\top \mathbf{y}
+=
 \begin{bmatrix}
-R_1 \boldsymbol{\beta} - \mathbf{c}_1 \\ - \mathbf{c}_2
+R_1 \boldsymbol{\beta} - \mathbf{c}_1 \\
+- \mathbf{c}_2
 \end{bmatrix}
 $$
 
