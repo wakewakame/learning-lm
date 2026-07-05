@@ -20,5 +20,7 @@
 | `docs/ai/N_topic.md` | AI (Claude) によるお手本解説。著者がレビューするまでは内容を鵜呑みにしない |
 | `src/bin/N_topic.rs` | サンプルコード |
 
+[`docs/ai/0_math_preliminaries.md`](./docs/ai/0_math_preliminaries.md) は 1〜8 を読むための前提知識 (行列・偏微分など、高校数学との橋渡し) をまとめたもの。
+
 `docs/ai/` のファイルは冒頭のバナーで「著者レビュー: 未 / 済」を管理する。
 実装して内容を確認できたら「済 (日付)」に更新し、気づいた点は `docs/N_topic.md` に自分の言葉で還元する。
