@@ -361,11 +361,8 @@ $$
 $$
 f(x + a, \, y + b)
 \approx
-f + \frac{\partial f}{\partial x} a + \frac{\partial f}{\partial y} b
-+ \frac{1}{2} \left(
-\frac{\partial^2 f}{\partial x^2} a^2
-+ 2 \frac{\partial^2 f}{\partial x \partial y} a b
-+ \frac{\partial^2 f}{\partial y^2} b^2
+f + \frac{\partial f}{\partial x} a + \frac{\partial f}{\partial y} b + \frac{1}{2} \left(
+\frac{\partial^2 f}{\partial x^2} a^2 + 2 \frac{\partial^2 f}{\partial x \partial y} a b + \frac{\partial^2 f}{\partial y^2} b^2
 \right)
 $$
 
@@ -400,8 +397,7 @@ $$
 $q$ の最小点は $\nabla_{\boldsymbol{\delta}}\, q = \mathbf{0}$ を解けばよい。2 変数で愚直に計算する。$\nabla f = (g_1, g_2)^\top$、$H = \begin{pmatrix} h_{11} & h_{12} \\ h_{12} & h_{22} \end{pmatrix}$、$\boldsymbol{\delta} = (\delta_1, \delta_2)^\top$ とおくと
 
 $$
-q(\delta_1, \delta_2) = f + g_1 \delta_1 + g_2 \delta_2
-+ \frac{1}{2} \left( h_{11} \delta_1^2 + 2 h_{12} \delta_1 \delta_2 + h_{22} \delta_2^2 \right)
+q(\delta_1, \delta_2) = f + g_1 \delta_1 + g_2 \delta_2 + \frac{1}{2} \left( h_{11} \delta_1^2 + 2 h_{12} \delta_1 \delta_2 + h_{22} \delta_2^2 \right)
 $$
 
 $\delta_1$、$\delta_2$ それぞれで偏微分すると
@@ -474,9 +470,7 @@ $$
 
 $$
 \begin{pmatrix} 1 & 0 \\ 0 & 1000 \end{pmatrix}
-\begin{pmatrix} \delta_1 \\ \delta_2 \end{pmatrix}
-=
-- \begin{pmatrix} 1 \\ 1000 \end{pmatrix}
+\begin{pmatrix} \delta_1 \\ \delta_2 \end{pmatrix} = - \begin{pmatrix} 1 \\ 1000 \end{pmatrix}
 $$
 
 第 1 行は $\delta_1 = -1$、第 2 行は $1000 \delta_2 = -1000$ より $\delta_2 = -1$。よって

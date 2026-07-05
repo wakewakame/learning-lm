@@ -119,9 +119,7 @@ $$
 $$
 E(\beta + \delta)
 \approx
-\underbrace{\bigl( (r_1')^2 + (r_2')^2 \bigr)}_{a} \, \delta^2
-+ \underbrace{2 (r_1' r_1 + r_2' r_2)}_{b} \, \delta
-+ \underbrace{r_1^2 + r_2^2}_{c}
+\underbrace{\bigl( (r_1')^2 + (r_2')^2 \bigr)}_{a} \, \delta^2 + \underbrace{2 (r_1' r_1 + r_2' r_2)}_{b} \, \delta + \underbrace{r_1^2 + r_2^2}_{c}
 $$
 
 というただの **下に凸な 2 次関数** $a \delta^2 + b \delta + c$ である。頂点の公式 $\delta = -\frac{b}{2a}$ から
@@ -189,11 +187,7 @@ $$
 $$
 r_i(\boldsymbol{\beta} + \boldsymbol{\delta})
 \approx
-r_i(\boldsymbol{\beta})
-+ \frac{\partial r_i}{\partial \beta_1} \delta_1
-+ \frac{\partial r_i}{\partial \beta_2} \delta_2
-+ \cdots
-+ \frac{\partial r_i}{\partial \beta_m} \delta_m
+r_i(\boldsymbol{\beta}) + \frac{\partial r_i}{\partial \beta_1} \delta_1 + \frac{\partial r_i}{\partial \beta_2} \delta_2 + \cdots + \frac{\partial r_i}{\partial \beta_m} \delta_m
 = r_i(\boldsymbol{\beta}) + \sum_{k=1}^{m} \frac{\partial r_i}{\partial \beta_k} \delta_k
 $$
 
@@ -306,13 +300,8 @@ $$
 \begin{aligned}
 \| \mathbf{r} + J \boldsymbol{\delta} \|^2
 &= (\mathbf{r} + J \boldsymbol{\delta})^\top (\mathbf{r} + J \boldsymbol{\delta}) \\
-&= \mathbf{r}^\top \mathbf{r}
-+ \mathbf{r}^\top J \boldsymbol{\delta}
-+ \boldsymbol{\delta}^\top J^\top \mathbf{r}
-+ \boldsymbol{\delta}^\top J^\top J \boldsymbol{\delta} \\
-&= \mathbf{r}^\top \mathbf{r}
-+ 2 \, (J^\top \mathbf{r})^\top \boldsymbol{\delta}
-+ \boldsymbol{\delta}^\top (J^\top J) \boldsymbol{\delta}
+&= \mathbf{r}^\top \mathbf{r} + \mathbf{r}^\top J \boldsymbol{\delta} + \boldsymbol{\delta}^\top J^\top \mathbf{r} + \boldsymbol{\delta}^\top J^\top J \boldsymbol{\delta} \\
+&= \mathbf{r}^\top \mathbf{r} + 2 \, (J^\top \mathbf{r})^\top \boldsymbol{\delta} + \boldsymbol{\delta}^\top (J^\top J) \boldsymbol{\delta}
 \end{aligned}
 $$
 
@@ -355,8 +344,7 @@ $$
 
 $$
 \frac{\partial}{\partial \beta_l} \Bigl( r_i \, \frac{\partial r_i}{\partial \beta_k} \Bigr)
-= \frac{\partial r_i}{\partial \beta_l} \, \frac{\partial r_i}{\partial \beta_k}
-+ r_i \, \frac{\partial^2 r_i}{\partial \beta_l \, \partial \beta_k}
+= \frac{\partial r_i}{\partial \beta_l} \, \frac{\partial r_i}{\partial \beta_k} + r_i \, \frac{\partial^2 r_i}{\partial \beta_l \, \partial \beta_k}
 $$
 
 よってヘッセ行列の $(k, l)$ 成分は
@@ -371,8 +359,7 @@ $$
 
 $$
 \nabla^2 E
-= 2 \Bigl( \underbrace{J^\top J}_{\text{1 階微分だけで計算できる}}
-+ \underbrace{\sum_{i=1}^{n} r_i \, \nabla^2 r_i}_{\text{2 階微分が必要}} \Bigr)
+= 2 \Bigl( \underbrace{J^\top J}_{\text{1 階微分だけで計算できる}} + \underbrace{\sum_{i=1}^{n} r_i \, \nabla^2 r_i}_{\text{2 階微分が必要}} \Bigr)
 $$
 
 となる (文書 4 の式の再導出)。

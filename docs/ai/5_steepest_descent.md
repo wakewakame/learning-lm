@@ -129,7 +129,7 @@ $$
 と書ける ($\| \mathbf{d} \| = 1$ を使った)。$\cos\theta$ の取り得る範囲は $-1 \leq \cos\theta \leq 1$ なので
 
 $$
-- \| \mathbf{g} \| \leq \mathbf{g}^\top \mathbf{d} \leq \| \mathbf{g} \|
+{} - \| \mathbf{g} \| \leq \mathbf{g}^\top \mathbf{d} \leq \| \mathbf{g} \|
 $$
 
 であり、最小値 $-\| \mathbf{g} \|$ が達成されるのは $\cos\theta = -1$、すなわち $\mathbf{d}$ が $\mathbf{g}$ と**正反対の向き**のとき、つまり

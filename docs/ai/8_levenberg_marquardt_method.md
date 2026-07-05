@@ -390,8 +390,7 @@ repeat:
 $$
 \min_{\boldsymbol{\delta}}
 \left\|
-\begin{bmatrix} J \\ \sqrt{\lambda} \, I \end{bmatrix} \boldsymbol{\delta}
--
+\begin{bmatrix} J \\ \sqrt{\lambda} \, I \end{bmatrix} \boldsymbol{\delta} -
 \begin{bmatrix} - \mathbf{r} \\ \mathbf{0} \end{bmatrix}
 \right\|^2
 $$
@@ -403,10 +402,8 @@ $$
 *方法 1: ノルムを直接展開する。* 縦に積んだベクトルのノルムの 2 乗は、各ブロックのノルムの 2 乗の和である ($\| [\mathbf{a}; \mathbf{b}] \|^2 = \| \mathbf{a} \|^2 + \| \mathbf{b} \|^2$。成分の 2 乗和を上下で分けて足すだけ)。積んだ行列とベクトルの積を計算すると
 
 $$
-\begin{bmatrix} J \\ \sqrt{\lambda} \, I \end{bmatrix} \boldsymbol{\delta}
--
-\begin{bmatrix} - \mathbf{r} \\ \mathbf{0} \end{bmatrix}
-=
+\begin{bmatrix} J \\ \sqrt{\lambda} \, I \end{bmatrix} \boldsymbol{\delta} -
+\begin{bmatrix} - \mathbf{r} \\ \mathbf{0} \end{bmatrix} =
 \begin{bmatrix} J \boldsymbol{\delta} + \mathbf{r} \\ \sqrt{\lambda} \, \boldsymbol{\delta} \end{bmatrix}
 $$
 
