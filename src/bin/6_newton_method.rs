@@ -5,7 +5,7 @@
 //   - 2 次関数ならどんな条件数でも 1 反復で厳密解に到達する
 //   - 滑らかな凸関数でも解の近くでは二次収束する
 
-use learning_lm::{norm, solve_linear, Mat};
+use learning_lm::{add_scaled, norm, solve_linear, Mat};
 
 /// 求根のニュートン法: x_{k+1} = x_k - g(x_k) / g'(x_k)
 pub fn newton_root(
@@ -41,11 +41,28 @@ pub fn newton_optimize(
         }
         let minus_g: Vec<f64> = g.iter().map(|gi| -gi).collect();
         let delta = solve_linear(&hess(&x), &minus_g).expect("ヘッセ行列が特異");
-        for (xi, di) in x.iter_mut().zip(&delta) {
-            *xi += di;
-        }
+        x = add_scaled(&x, 1.0, &delta); // x + δ
     }
     (x, history)
+}
+
+// 3 番の例で使う滑らかな凸関数 f(x, y) = e^(x+y-1) + e^(x-y-1) + e^(-x-1)
+fn convex_exps(x: &[f64]) -> (f64, f64, f64) {
+    ((x[0] + x[1] - 1.0).exp(), (x[0] - x[1] - 1.0).exp(), (-x[0] - 1.0).exp())
+}
+
+fn convex_grad(x: &[f64]) -> Vec<f64> {
+    let (e1, e2, e3) = convex_exps(x);
+    vec![e1 + e2 - e3, e1 - e2]
+}
+
+fn convex_hess(x: &[f64]) -> Mat {
+    let (e1, e2, e3) = convex_exps(x);
+    Mat::from_fn(2, 2, |i, j| match (i, j) {
+        (0, 0) => e1 + e2 + e3,
+        (1, 1) => e1 + e2,
+        _ => e1 - e2,
+    })
 }
 
 fn main() {
@@ -64,11 +81,7 @@ fn main() {
     let kappa = 1000.0;
     let (x, history) = newton_optimize(
         &|x| vec![x[0], kappa * x[1]],
-        &|_| Mat::from_fn(2, 2, |i, j| match (i, j) {
-            (0, 0) => 1.0,
-            (1, 1) => kappa,
-            _ => 0.0,
-        }),
+        &|_| Mat::diag(&[1.0, kappa]),
         &[1.0, 1.0],
         1e-10,
         10,
@@ -79,19 +92,7 @@ fn main() {
     // f(x, y) = exp(x+y-1) + exp(x-y-1) + exp(-x-1)
     println!();
     println!("== 凸関数 f = e^(x+y-1) + e^(x-y-1) + e^(-x-1) を (-1, 1) から ==");
-    let grad = |x: &[f64]| {
-        let (e1, e2, e3) = ((x[0] + x[1] - 1.0).exp(), (x[0] - x[1] - 1.0).exp(), (-x[0] - 1.0).exp());
-        vec![e1 + e2 - e3, e1 - e2]
-    };
-    let hess = |x: &[f64]| {
-        let (e1, e2, e3) = ((x[0] + x[1] - 1.0).exp(), (x[0] - x[1] - 1.0).exp(), (-x[0] - 1.0).exp());
-        Mat::from_fn(2, 2, |i, j| match (i, j) {
-            (0, 0) => e1 + e2 + e3,
-            (1, 1) => e1 + e2,
-            _ => e1 - e2,
-        })
-    };
-    let (x, history) = newton_optimize(&grad, &hess, &[-1.0, 1.0], 1e-14, 50);
+    let (x, history) = newton_optimize(&convex_grad, &convex_hess, &[-1.0, 1.0], 1e-14, 50);
     for (k, g_norm) in history.iter().enumerate() {
         println!("反復 {k}: ‖∇f‖ = {g_norm:.3e}");
     }
@@ -126,13 +127,7 @@ mod tests {
         for kappa in [1.0, 100.0, 1e6] {
             let (x, history) = newton_optimize(
                 &move |x: &[f64]| vec![x[0], kappa * x[1]],
-                &move |_: &[f64]| {
-                    Mat::from_fn(2, 2, |i, j| match (i, j) {
-                        (0, 0) => 1.0,
-                        (1, 1) => kappa,
-                        _ => 0.0,
-                    })
-                },
+                &move |_: &[f64]| Mat::diag(&[1.0, kappa]),
                 &[1.0, 1.0],
                 1e-10,
                 10,
@@ -145,22 +140,8 @@ mod tests {
     // 凸関数で停留点 (∇f = 0) に到達すること
     #[test]
     fn test_convex_function() {
-        let grad = |x: &[f64]| {
-            let (e1, e2, e3) =
-                ((x[0] + x[1] - 1.0).exp(), (x[0] - x[1] - 1.0).exp(), (-x[0] - 1.0).exp());
-            vec![e1 + e2 - e3, e1 - e2]
-        };
-        let hess = |x: &[f64]| {
-            let (e1, e2, e3) =
-                ((x[0] + x[1] - 1.0).exp(), (x[0] - x[1] - 1.0).exp(), (-x[0] - 1.0).exp());
-            Mat::from_fn(2, 2, |i, j| match (i, j) {
-                (0, 0) => e1 + e2 + e3,
-                (1, 1) => e1 + e2,
-                _ => e1 - e2,
-            })
-        };
-        let (x, history) = newton_optimize(&grad, &hess, &[-1.0, 1.0], 1e-12, 50);
-        assert!(norm(&grad(&x)) < 1e-12);
+        let (x, history) = newton_optimize(&convex_grad, &convex_hess, &[-1.0, 1.0], 1e-12, 50);
+        assert!(norm(&convex_grad(&x)) < 1e-12);
         assert!(history.len() < 20, "収束が遅すぎる: {} 反復", history.len());
     }
 }

@@ -14,7 +14,7 @@ fn vandermonde_comparison(n: usize, m: usize) -> (f64, f64) {
         let x = i as f64 / (n - 1) as f64;
         x.powi(j as i32)
     });
-    let y: Vec<f64> = (0..n).map(|i| phi.matvec(&vec![1.0; m])[i]).collect();
+    let y = phi.matvec(&vec![1.0; m]);
 
     // 正規方程式 (ΦᵀΦ) c = Φᵀy を素朴に解く (条件数が κ² に悪化する)
     let phi_t = phi.transpose();
@@ -56,7 +56,7 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use learning_lm::{dot, norm};
+    use learning_lm::{dot, norm, sub};
 
     // ランダム行列に対して QR 分解の定義を満たすことを確認
     #[test]
@@ -114,8 +114,7 @@ mod tests {
         let a = Mat::from_fn(20, 4, |_, _| rng.random_range(-1.0..1.0));
         let b: Vec<f64> = (0..20).map(|_| rng.random_range(-1.0..1.0)).collect();
         let x = lstsq_qr(&a, &b);
-        let ax = a.matvec(&x);
-        let r: Vec<f64> = b.iter().zip(&ax).map(|(bi, axi)| bi - axi).collect();
+        let r = sub(&b, &a.matvec(&x));
         for j in 0..4 {
             assert!(dot(&a.col(j), &r).abs() < 1e-10 * norm(&r).max(1.0));
         }

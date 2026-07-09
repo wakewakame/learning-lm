@@ -8,7 +8,7 @@
 // - 良い初期値ではガウス・ニュートン法と同等の速さ
 // - ガウス・ニュートン法が発散した悪い初期値 (7 番参照) でも収束する
 
-use learning_lm::{dot, lstsq_qr, norm, Mat};
+use learning_lm::{add_scaled, dot, lstsq_qr, norm, Mat};
 use rand::prelude::*;
 
 /// テスト用データ: y = 2.0 exp(-1.5 x) + ノイズ (4, 7 番と同じ設定)
@@ -91,7 +91,7 @@ pub fn levenberg_marquardt(
         if norm(&delta) <= eps2 * (norm(&beta) + eps2) {
             break; // 更新量が十分小さい
         }
-        let beta_new: Vec<f64> = beta.iter().zip(&delta).map(|(bi, di)| bi + di).collect();
+        let beta_new = add_scaled(&beta, 1.0, &delta); // β + δ
         let r_new = residual(&beta_new);
         let e_new = dot(&r_new, &r_new);
         // ゲイン比 ρ = 実際の減少量 / 線形化モデルが予測した減少量

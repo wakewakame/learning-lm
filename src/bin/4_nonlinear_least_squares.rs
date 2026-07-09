@@ -63,6 +63,12 @@ pub fn objective(data: &Dataset, beta: &[f64]) -> f64 {
     dot(&r, &r)
 }
 
+/// 勾配 ∇E = 2 Jᵀ r
+pub fn gradient(data: &Dataset, beta: &[f64]) -> Vec<f64> {
+    let jt_r = jacobian(data, beta).transpose().matvec(&residual(data, beta));
+    jt_r.iter().map(|g| 2.0 * g).collect()
+}
+
 /// 中心差分による数値微分でヤコビ行列を計算する (解析解の検証用)
 fn jacobian_numeric(data: &Dataset, beta: &[f64]) -> Mat {
     Mat::from_fn(data.xs.len(), beta.len(), |i, k| {
@@ -102,8 +108,7 @@ fn main() {
     // 2. 勾配の構造 ∇E = 2 Jᵀ r の確認
     println!();
     println!("== ∇E = 2 Jᵀ r の検証 (vs E の数値微分) ==");
-    let r = residual(&data, &beta);
-    let grad_struct = j.transpose().matvec(&r).iter().map(|g| 2.0 * g).collect::<Vec<_>>();
+    let grad_struct = gradient(&data, &beta);
     let grad_num: Vec<f64> = (0..2)
         .map(|k| {
             let h = 1e-6;
@@ -125,9 +130,7 @@ fn main() {
     println!("E(log線形化)  = {:.6e}", objective(&data, &beta_loglin));
     // E の最小点なら ∇E = 2Jᵀr = 0 のはずだが、log 線形化の解ではゼロにならない。
     // つまりこれは「log y の残差の最小二乗」という別の問題の解である。
-    let j_ll = jacobian(&data, &beta_loglin);
-    let r_ll = residual(&data, &beta_loglin);
-    let grad_ll: Vec<f64> = j_ll.transpose().matvec(&r_ll).iter().map(|g| 2.0 * g).collect();
+    let grad_ll = gradient(&data, &beta_loglin);
     println!("∇E(log線形化) = {grad_ll:.6?} (≠ 0 → E の停留点ではない)");
     println!("(log 線形化は log y の残差を最小化する別の問題を解いている。");
     println!(" ただし 7, 8 番の反復法の初期値としては十分良い。");
@@ -153,9 +156,7 @@ mod tests {
     fn test_gradient_structure() {
         let data = make_dataset(0.01, 42);
         let beta = [1.0, -1.0];
-        let j = jacobian(&data, &beta);
-        let r = residual(&data, &beta);
-        let grad: Vec<f64> = j.transpose().matvec(&r).iter().map(|g| 2.0 * g).collect();
+        let grad = gradient(&data, &beta);
         for k in 0..2 {
             let h = 1e-6;
             let mut bp = beta.to_vec();
@@ -176,9 +177,7 @@ mod tests {
         assert!((beta_loglin[0] - 2.0).abs() < 0.3);
         assert!((beta_loglin[1] + 1.5).abs() < 0.3);
         // しかし ∇E = 2Jᵀr はゼロにならない = E の最小点ではない
-        let j = jacobian(&data, &beta_loglin);
-        let r = residual(&data, &beta_loglin);
-        let grad: Vec<f64> = j.transpose().matvec(&r).iter().map(|g| 2.0 * g).collect();
+        let grad = gradient(&data, &beta_loglin);
         assert!(learning_lm::norm(&grad) > 1e-4, "∇E = {grad:?}");
     }
 }

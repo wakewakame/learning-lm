@@ -29,6 +29,15 @@ impl Mat {
         m
     }
 
+    /// 対角行列 diag(d) を作る
+    pub fn diag(d: &[f64]) -> Self {
+        let mut m = Self::zeros(d.len(), d.len());
+        for (i, &di) in d.iter().enumerate() {
+            m[(i, i)] = di;
+        }
+        m
+    }
+
     pub fn from_fn(rows: usize, cols: usize, mut f: impl FnMut(usize, usize) -> f64) -> Self {
         let mut m = Self::zeros(rows, cols);
         for i in 0..rows {
@@ -93,6 +102,31 @@ pub fn norm(a: &[f64]) -> f64 {
     dot(a, a).sqrt()
 }
 
+/// a - b (成分ごとの引き算)
+pub fn sub(a: &[f64], b: &[f64]) -> Vec<f64> {
+    assert_eq!(a.len(), b.len());
+    a.iter().zip(b).map(|(x, y)| x - y).collect()
+}
+
+/// x + α d を返す (反復法の更新 x ← x + αδ や x ← x - α∇f に使う)
+pub fn add_scaled(x: &[f64], alpha: f64, d: &[f64]) -> Vec<f64> {
+    assert_eq!(x.len(), d.len());
+    x.iter().zip(d).map(|(xi, di)| xi + alpha * di).collect()
+}
+
+/// x にハウスホルダー鏡映を適用する: x ← H x = x - 2 (v·x)/(v·v) v
+/// (docs/ai/2 の 5.1 節。v = 0 のときは H = I として何もしない)
+fn reflect(v: &[f64], x: &mut [f64]) {
+    let vtv = dot(v, v);
+    if vtv == 0.0 {
+        return;
+    }
+    let c = 2.0 * dot(v, x) / vtv;
+    for (xi, vi) in x.iter_mut().zip(v) {
+        *xi -= c * vi;
+    }
+}
+
 /// 部分ピボット付きガウス消去で正方連立 1 次方程式 Ax = b を解く。
 /// 特異 (に近い) 場合は None を返す。
 pub fn solve_linear(a: &Mat, b: &[f64]) -> Option<Vec<f64>> {
@@ -124,14 +158,8 @@ pub fn solve_linear(a: &Mat, b: &[f64]) -> Option<Vec<f64>> {
             x[i] -= factor * x[k];
         }
     }
-    // 後退代入
-    for k in (0..n).rev() {
-        for j in (k + 1)..n {
-            x[k] -= w[(k, j)] * x[j];
-        }
-        x[k] /= w[(k, k)];
-    }
-    Some(x)
+    // 前進消去で w は上三角になったので、あとは後退代入
+    Some(back_substitution(&w, &x))
 }
 
 /// 上三角行列 R に対する後退代入 (Rx = b を解く)。
@@ -159,25 +187,17 @@ fn householder(a: &Mat) -> (Vec<Vec<f64>>, Mat) {
     let mut w = a.clone();
     let mut vs: Vec<Vec<f64>> = Vec::with_capacity(m);
     for k in 0..m {
-        // 第 k 列の対角以下を x とし、x を ±||x|| e1 に写す鏡映ベクトル v を作る
+        // 第 k 列の対角以下を x とし、x を ±||x|| e1 に写す鏡映ベクトル v を作る。
+        // 桁落ちを避けるため x_1 と同符号側を選ぶ: v = x + sign(x_1) ||x|| e1
         let mut v: Vec<f64> = (k..n).map(|i| w[(i, k)]).collect();
         let normx = norm(&v);
-        if normx > 0.0 {
-            // 桁落ちを避けるため x_1 と同符号側を選ぶ: v = x + sign(x_1) ||x|| e1
-            let alpha = if v[0] >= 0.0 { -normx } else { normx };
-            v[0] -= alpha;
-            let vtv = dot(&v, &v);
-            if vtv > 0.0 {
-                // W[k.., k..] に H = I - 2 v vᵀ / (vᵀv) を適用
-                for j in k..m {
-                    let c = {
-                        let col: Vec<f64> = (k..n).map(|i| w[(i, j)]).collect();
-                        2.0 * dot(&v, &col) / vtv
-                    };
-                    for (idx, i) in (k..n).enumerate() {
-                        w[(i, j)] -= c * v[idx];
-                    }
-                }
+        v[0] += if v[0] >= 0.0 { normx } else { -normx };
+        // W[k.., k..] の各列に鏡映 H = I - 2 v vᵀ / (vᵀv) を適用
+        for j in k..m {
+            let mut col: Vec<f64> = (k..n).map(|i| w[(i, j)]).collect();
+            reflect(&v, &mut col);
+            for (t, i) in (k..n).enumerate() {
+                w[(i, j)] = col[t];
             }
         }
         vs.push(v);
@@ -194,15 +214,8 @@ fn householder(a: &Mat) -> (Vec<Vec<f64>>, Mat) {
 /// 鏡映ベクトル群を b に順に適用する (b <- H_m ... H_1 b、つまり b <- Qᵀ b)
 fn apply_householder(vs: &[Vec<f64>], b: &mut [f64]) {
     for (k, v) in vs.iter().enumerate() {
-        let vtv = dot(v, v);
-        if vtv == 0.0 {
-            continue;
-        }
-        let seg = &mut b[k..];
-        let c = 2.0 * v.iter().zip(seg.iter()).map(|(x, y)| x * y).sum::<f64>() / vtv;
-        for (i, vi) in v.iter().enumerate() {
-            seg[i] -= c * vi;
-        }
+        // H_k は先頭 k 成分に触らないので、b[k..] だけに鏡映を適用すればよい
+        reflect(v, &mut b[k..]);
     }
 }
 
@@ -214,18 +227,11 @@ pub fn qr_thin(a: &Mat) -> (Mat, Mat) {
     // Q = H_1 ... H_m [I; O] を列ごとに構成する (鏡映を逆順に適用)
     let mut q = Mat::zeros(n, m);
     for j in 0..m {
+        // Q の第 j 列 = H_1 ... H_m e_j
         let mut e = vec![0.0; n];
         e[j] = 1.0;
-        for k in (0..vs.len()).rev() {
-            let v = &vs[k];
-            let vtv = dot(v, v);
-            if vtv == 0.0 {
-                continue;
-            }
-            let c = 2.0 * v.iter().zip(e[k..].iter()).map(|(x, y)| x * y).sum::<f64>() / vtv;
-            for (i, vi) in v.iter().enumerate() {
-                e[k + i] -= c * vi;
-            }
+        for (k, v) in vs.iter().enumerate().rev() {
+            reflect(v, &mut e[k..]);
         }
         for i in 0..n {
             q[(i, j)] = e[i];
@@ -244,6 +250,16 @@ pub fn lstsq_qr(a: &Mat, b: &[f64]) -> Vec<f64> {
     back_substitution(&r, &qtb[..a.cols])
 }
 
+/// 列 p, q にギブンス回転を適用する:
+/// (col_p, col_q) ← (c col_p - s col_q, s col_p + c col_q)
+fn rotate_cols(a: &mut Mat, p: usize, q: usize, c: f64, s: f64) {
+    for i in 0..a.rows {
+        let (aip, aiq) = (a[(i, p)], a[(i, q)]);
+        a[(i, p)] = c * aip - s * aiq;
+        a[(i, q)] = s * aip + c * aiq;
+    }
+}
+
 /// 片側ヤコビ法 (Hestenes 法) による薄い特異値分解。
 /// A (n x m, n >= m) に対し A = U diag(σ) Vᵀ となる
 /// (U: n x m, σ: 降順の特異値, V: m x m 直交) を返す。
@@ -259,32 +275,21 @@ pub fn jacobi_svd(a: &Mat) -> (Mat, Vec<f64>, Mat) {
         let mut max_off = 0.0f64;
         for p in 0..m {
             for q in (p + 1)..m {
-                let (mut app, mut aqq, mut apq) = (0.0, 0.0, 0.0);
-                for i in 0..n {
-                    app += b[(i, p)] * b[(i, p)];
-                    aqq += b[(i, q)] * b[(i, q)];
-                    apq += b[(i, p)] * b[(i, q)];
-                }
+                // 列 p, q の内積 (2x2 のグラム行列 [app apq; apq aqq] の成分)
+                let (bp, bq) = (b.col(p), b.col(q));
+                let (app, aqq, apq) = (dot(&bp, &bp), dot(&bq, &bq), dot(&bp, &bq));
                 let denom = (app * aqq).sqrt();
                 if denom == 0.0 || apq.abs() <= eps * denom {
                     continue;
                 }
                 max_off = max_off.max(apq.abs() / denom);
-                // 列 p, q を直交化するギブンス回転を求める
+                // 列 p, q を直交化するギブンス回転を求め、B と V の両方に適用する
                 let zeta = (aqq - app) / (2.0 * apq);
                 let t = zeta.signum() / (zeta.abs() + (1.0 + zeta * zeta).sqrt());
                 let c = 1.0 / (1.0 + t * t).sqrt();
                 let s = c * t;
-                for i in 0..n {
-                    let (bip, biq) = (b[(i, p)], b[(i, q)]);
-                    b[(i, p)] = c * bip - s * biq;
-                    b[(i, q)] = s * bip + c * biq;
-                }
-                for i in 0..m {
-                    let (vip, viq) = (v[(i, p)], v[(i, q)]);
-                    v[(i, p)] = c * vip - s * viq;
-                    v[(i, q)] = s * vip + c * viq;
-                }
+                rotate_cols(&mut b, p, q, c, s);
+                rotate_cols(&mut v, p, q, c, s);
             }
         }
         if max_off <= eps {
@@ -319,13 +324,11 @@ pub fn jacobi_svd(a: &Mat) -> (Mat, Vec<f64>, Mat) {
 pub fn svd_lstsq(a: &Mat, b: &[f64], rcond: f64) -> Vec<f64> {
     let (u, sigma, v) = jacobi_svd(a);
     let tol = sigma.first().copied().unwrap_or(0.0) * rcond;
+    // x = Σ_j (u_j·b / σ_j) v_j  (σ_j > tol の項だけ足す)
     let mut x = vec![0.0; a.cols];
-    for j in 0..a.cols {
-        if sigma[j] > tol {
-            let coef = dot(&u.col(j), b) / sigma[j];
-            for i in 0..a.cols {
-                x[i] += coef * v[(i, j)];
-            }
+    for (j, &s) in sigma.iter().enumerate() {
+        if s > tol {
+            x = add_scaled(&x, dot(&u.col(j), b) / s, &v.col(j));
         }
     }
     x

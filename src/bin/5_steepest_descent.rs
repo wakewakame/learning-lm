@@ -4,7 +4,7 @@
 // - 収束の速さが条件数 κ に強く依存する (ジグザグする) ことを観察する
 // - 非線形最小二乗 (指数減衰モデル) にも適用してみる
 
-use learning_lm::norm;
+use learning_lm::{add_scaled, norm};
 use rand::prelude::*;
 
 /// バックトラッキング直線探索付きの最急降下法。
@@ -28,7 +28,7 @@ pub fn steepest_descent(
         let c = 1e-4;
         let mut alpha = 1.0;
         loop {
-            let x_new: Vec<f64> = x.iter().zip(&g).map(|(xi, gi)| xi - alpha * gi).collect();
+            let x_new = add_scaled(&x, -alpha, &g); // x - α∇f
             if f(&x_new) <= fx - c * alpha * g_norm * g_norm {
                 x = x_new;
                 break;

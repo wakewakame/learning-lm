@@ -5,7 +5,7 @@
 // - 良い初期値からは少ない反復で収束する (5 番の最急降下法と比べてみる)
 // - ステップ制御がないため、悪い初期値からは発散し得る (8 番の LM 法の動機)
 
-use learning_lm::{lstsq_qr, norm, Mat};
+use learning_lm::{add_scaled, dot, lstsq_qr, norm, Mat};
 use rand::prelude::*;
 
 /// テスト用データ: y = 2.0 exp(-1.5 x) + ノイズ (4 番と同じ設定)
@@ -49,7 +49,7 @@ pub fn gauss_newton(
     let mut history = vec![];
     for _ in 0..max_iter {
         let r = residual(&beta);
-        let e = learning_lm::dot(&r, &r);
+        let e = dot(&r, &r);
         history.push(e);
         if !e.is_finite() {
             break; // 発散 (故障モード 1: 線形化の範囲外へ飛びすぎた)
@@ -61,11 +61,10 @@ pub fn gauss_newton(
         if !delta.iter().all(|d| d.is_finite()) {
             break; // JᵀJ が特異 (故障モード 2: δ が計算できない)
         }
-        for (bi, di) in beta.iter_mut().zip(&delta) {
-            *bi += di;
-        }
+        beta = add_scaled(&beta, 1.0, &delta); // β + δ
         if norm(&delta) <= tol * (norm(&beta) + tol) {
-            history.push(learning_lm::dot(&residual(&beta), &residual(&beta)));
+            let r = residual(&beta);
+            history.push(dot(&r, &r));
             break;
         }
     }
