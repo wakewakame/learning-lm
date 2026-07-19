@@ -5,6 +5,9 @@
 // - `solve_linear`: 部分ピボット付きガウス消去
 // - `qr_thin` / `lstsq_qr`: ハウスホルダー変換による QR 分解と線形最小二乗 (docs/ai/2)
 // - `jacobi_svd` / `svd_lstsq`: 片側ヤコビ法による SVD と最小ノルム最小二乗 (docs/ai/3)
+// - `geometry`: カメラ幾何の共有部品 (docs/ai/9 以降で共用)
+
+pub mod geometry;
 
 use std::ops::{Index, IndexMut};
 
